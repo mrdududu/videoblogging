@@ -50,4 +50,18 @@ H2 {
   margin: 25px 0 0 0;
   padding: 0;
 }
+@media screen and (min-width: 600px) {
+  .bg {
+    background-size: 100% auto;
+    background-position: 50% 50%;
+  }
+  H1 {
+    font-size: 48px;
+    line-height: 52px;
+  }
+  H2 {
+    font-size: 36px;
+    line-height: 40px;
+  }
+}
 </style>
