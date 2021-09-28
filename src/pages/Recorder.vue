@@ -50,6 +50,7 @@
 
 <script>
 import { defineComponent, ref, onMounted } from "vue";
+import { saveAs } from "file-saver";
 
 const RecorderStates = Object.freeze({
   STOP: Symbol("stop"),
@@ -173,15 +174,8 @@ export default defineComponent({
       const blob = new Blob(recordedChunks, {
         type: `${defaultMimeType.mediaType}/${defaultMimeType.ext}`,
       });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.style = "display: none";
-      a.href = url;
-      a.download = `vb_${Date.now()}.${defaultMimeType.ext}`;
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      const fileName = `vb_${Date.now()}.${defaultMimeType.ext}`;
+      saveAs(blob, fileName);
     };
 
     return {

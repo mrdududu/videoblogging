@@ -1,69 +1,53 @@
 <template>
-  <q-page>
-    <div>
-      <q-btn label="Start" @click="onStartClick" />
-      <q-btn label="Stop" @click="onStopClick" />
-      <q-btn label="Download" @click="onDownloadClick" />
-    </div>
-    <video ref="player" autoplay muted></video>
+  <q-page class="column bg">
+    <h1>
+      Free app<br />for<br />
+      video content creators
+    </h1>
+    <h2>
+      Video camera +<br />
+      Script assistant<br />
+      in one app
+    </h2>
+    <q-page-sticky position="bottom" :offset="[0, 18]">
+      <q-btn
+        rounded
+        size="lg"
+        icon="camera"
+        color="accent"
+        label="Start"
+        to="~/recorder"
+      />
+    </q-page-sticky>
   </q-page>
 </template>
-
 <script>
 import { defineComponent, ref, onMounted } from "vue";
-
 export default defineComponent({
-  setup() {
-    const player = ref(null);
-
-    let mediaStream;
-    const recordedChunks = [];
-    let mediaRecorder;
-
-    onMounted(() => {
-      console.log("onMounted", player.value);
-      navigator.mediaDevices
-        .getUserMedia({ audio: true, video: true })
-        .then((stream) => {
-          player.value.srcObject = mediaStream = stream;
-        });
-    });
-
-    const onStartClick = () => {
-      console.log("onStartClick");
-
-      mediaRecorder = new MediaRecorder(mediaStream, {
-        mimeType: "video/webm; codecs=vp9",
-      });
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          recordedChunks.push(e.data);
-        }
-      };
-      mediaRecorder.start();
-    };
-    const onStopClick = () => {
-      console.log("onStopClick");
-
-      mediaRecorder.stop();
-    };
-    const onDownloadClick = () => {
-      console.log("onDownloadClick");
-
-      const blob = new Blob(recordedChunks, {
-        type: "video/webm",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.style = "display: none";
-      a.href = url;
-      a.download = "cam.webm";
-      a.click();
-      window.URL.revokeObjectURL(url);
-    };
-
-    return { player, onStartClick, onStopClick, onDownloadClick };
-  },
+  setup() {},
 });
 </script>
+<style lang="scss" scoped>
+.bg {
+  background: url(~assets/img/bg-creator.jpg) no-repeat center center fixed;
+  background-size: auto 100%;
+  background-position: 5% 0%;
+  padding: 40px;
+}
+H1 {
+  font-size: 30px;
+  color: white;
+  font-weight: bold;
+  line-height: 40px;
+  margin: 0;
+  padding: 0;
+}
+H2 {
+  font-size: 24px;
+  color: white;
+  font-weight: normal;
+  line-height: 34px;
+  margin: 25px 0 0 0;
+  padding: 0;
+}
+</style>
