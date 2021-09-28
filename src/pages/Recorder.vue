@@ -1,7 +1,11 @@
 <template>
   <q-page class="column">
     <div class="text_block column">
-      <textarea class="textarea" placeholder="Enter you script here" />
+      <textarea
+        v-model="script"
+        class="textarea"
+        placeholder="Enter you script here"
+      />
     </div>
     <div class="player_block">
       <div class="player_container">
@@ -49,7 +53,8 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { useQuasar } from "quasar";
 import { saveAs } from "file-saver";
 
 const RecorderStates = Object.freeze({
@@ -126,19 +131,26 @@ const defaultMimeType =
 
 export default defineComponent({
   setup() {
+    const $q = useQuasar();
+    const script = ref($q.localStorage.getItem("script") ?? "");
     const player = ref(null);
     const recorderState = ref(RecorderStates.STOP);
 
     // let mediaStream;
     let recordedChunks = [];
     let mediaRecorder;
+    let mediaStream;
+
+    watch(script, (newscript) => {
+      $q.localStorage.set("script", newscript);
+    });
 
     onMounted(() => {
       console.log("onMounted", player.value);
       navigator.mediaDevices
         .getUserMedia({ audio: true, video: { facingMode: "user" } })
         .then((stream) => {
-          player.value.srcObject = stream;
+          player.value.srcObject = mediaStream = stream;
 
           mediaRecorder = new MediaRecorder(stream, {
             mimeType: defaultMimeType.mimeType,
@@ -154,6 +166,12 @@ export default defineComponent({
             download();
           };
         });
+    });
+
+    onBeforeUnmount(() => {
+      mediaStream.getTracks().forEach((track) => {
+        track.stop();
+      });
     });
 
     const onStartClick = () => {
@@ -180,6 +198,7 @@ export default defineComponent({
 
     return {
       player,
+      script,
       onStartClick,
       onStopClick,
       // onDownloadClick,
